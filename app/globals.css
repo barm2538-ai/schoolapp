@@ -1,0 +1,63 @@
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-geist-sans);
+  --font-mono: var(--font-geist-mono);
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+}
+@media print {
+  .print\:block {
+    display: block !important;
+  }
+  body {
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  aside, .print\:hidden {
+    display: none !important;
+  }
+  main {
+    padding: 1rem !important;
+    margin: 0 !important;
+  }
+  #report-page {
+    width: 100% !important;
+    max-width: 100% !important;
+  }
+  table {
+    font-size: 9pt; /* ลดขนาดตัวอักษรเล็กน้อย */
+    break-inside: auto;
+  }
+  tr {
+    break-inside: avoid;
+    break-after: auto;
+  }
+  th, td {
+    border: 1px solid #ddd;
+  }
+  .bg-white, .bg-gray-100 {
+    background-color: transparent !important;
+  }
+  .shadow-md {
+    box-shadow: none !important;
+  }
+}
