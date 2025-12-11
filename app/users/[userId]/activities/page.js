@@ -1,28 +1,43 @@
 "use client";
 
-import { useState, useEffect } from 'react';
-import { db } from '../../../../firebaseConfig';
-import { collection, query, orderBy, onSnapshot, doc, deleteDoc } from 'firebase/firestore';
-import CompletedActivityForm from '../../../../components/CompletedActivityForm';
+import { useState, useEffect, use } from 'react'; // ★ 1. เพิ่ม use
+import { db } from '../../../../firebaseConfig'; // ★ 2. ถอย 4 ชั้น
+import { collection, query, orderBy, onSnapshot, doc, deleteDoc, getDoc } from 'firebase/firestore';
+import CompletedActivityForm from '../../../../components/CompletedActivityForm'; // ★ 3. ถอย 4 ชั้น
 import Link from 'next/link';
+import { FaArrowLeft, FaPlus, FaTrash, FaEdit, FaRunning } from 'react-icons/fa';
 
 export default function ManageUserActivitiesPage({ params }) {
-  const { userId } = params;
+  // ★ 4. แก้การรับค่า params
+  const { userId } = use(params);
+
+  const [studentName, setStudentName] = useState('');
   const [activities, setActivities] = useState([]);
   const [loading, setLoading] = useState(true);
+  
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingActivity, setEditingActivity] = useState(null);
 
   useEffect(() => {
     if (!userId) return;
+    
+    // ดึงชื่อนักเรียน
+    getDoc(doc(db, 'users', userId)).then(snap => {
+        if(snap.exists()) {
+            const data = snap.data();
+            setStudentName(data.fullName || data.email);
+        }
+    });
+
+    // ดึงกิจกรรม
     const q = query(collection(db, 'users', userId, 'completedActivities'), orderBy('completedDate', 'desc'));
     const unsubscribe = onSnapshot(q, (snapshot) => {
       const data = snapshot.docs.map(doc => {
-        const docData = doc.data();
+        const d = doc.data();
         return { 
           id: doc.id, 
-          ...docData,
-          formattedDate: docData.completedDate ? new Date(docData.completedDate.toDate()).toLocaleDateString('th-TH') : 'N/A'
+          ...d,
+          formattedDate: d.completedDate ? new Date(d.completedDate.toDate()).toLocaleDateString('th-TH') : '-'
         };
       });
       setActivities(data);
@@ -32,8 +47,10 @@ export default function ManageUserActivitiesPage({ params }) {
   }, [userId]);
 
   const handleDelete = async (activityId) => {
-    if (window.confirm("คุณแน่ใจหรือไม่ว่าต้องการลบกิจกรรมนี้?")) {
-      await deleteDoc(doc(db, 'users', userId, 'completedActivities', activityId));
+    if (window.confirm("ยืนยันลบกิจกรรมนี้?")) {
+      try {
+        await deleteDoc(doc(db, 'users', userId, 'completedActivities', activityId));
+      } catch (e) { alert("ลบไม่สำเร็จ"); }
     }
   };
 
@@ -47,52 +64,67 @@ export default function ManageUserActivitiesPage({ params }) {
     setEditingActivity(null);
   };
 
-  if (loading) return <p className="text-center p-8">กำลังโหลดข้อมูล...</p>;
+  if (loading) return <div className="p-10 text-center text-gray-500">กำลังโหลดข้อมูล...</div>;
 
   return (
-    <>
-      <div className="w-full max-w-5xl">
-        <div className="flex justify-between items-center mb-8">
-            <div>
-                <Link href="/users" className="text-blue-500 hover:underline mb-2 block">&larr; กลับไปหน้าจัดการผู้ใช้</Link>
-                <h1 className="text-3xl font-bold">จัดการกิจกรรมที่เข้าร่วม</h1>
-            </div>
-            <button onClick={() => { setEditingActivity(null); setIsModalOpen(true); }} className="bg-blue-500 text-white px-4 py-2 rounded">
-              + เพิ่มกิจกรรม
-            </button>
-        </div>
-        <div className="bg-white rounded-lg shadow-md">
-          <table className="w-full text-left">
-            <thead>
-              <tr className="bg-gray-100">
-                <th className="p-4">ชื่อกิจกรรม</th>
-                <th className="p-4">วันที่เข้าร่วม</th>
-                <th className="p-4">ชั่วโมง</th>
-                <th className="p-4">จัดการ</th>
-              </tr>
-            </thead>
-            <tbody>
-              {activities.map((item) => (
-                <tr key={item.id} className="border-b">
-                  <td className="p-4 font-medium">{item.activityName}</td>
-                  <td className="p-4 text-gray-600">{item.formattedDate}</td>
-                  <td className="p-4 text-gray-600">{item.hours}</td>
-                  <td className="p-4">
-                    <button onClick={() => handleEdit(item)} className="text-yellow-500 hover:underline mr-4">แก้ไข</button>
-                    <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:underline">ลบ</button>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
+    <div className="max-w-5xl mx-auto p-6">
+        
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-6 gap-4">
+          <div>
+            <Link href="/users" className="text-blue-600 hover:text-blue-800 flex items-center gap-2 mb-2 font-bold transition">
+                <FaArrowLeft /> กลับไปหน้าจัดการผู้ใช้
+            </Link>
+            <h1 className="text-2xl font-bold text-gray-800 flex items-center gap-2">
+                <FaRunning className="text-pink-600"/> กิจกรรมของ: <span className="text-blue-600">{studentName}</span>
+            </h1>
+          </div>
+          <button onClick={() => { setEditingActivity(null); setIsModalOpen(true); }} className="bg-pink-600 text-white px-4 py-2 rounded-lg hover:bg-pink-700 flex items-center gap-2 shadow-sm transition">
+             <FaPlus /> เพิ่มกิจกรรม
+          </button>
       </div>
+
+      <div className="bg-white rounded-xl shadow-sm overflow-hidden border border-gray-200">
+        <table className="w-full text-left border-collapse">
+          <thead className="bg-pink-50 border-b border-pink-100 text-pink-900">
+            <tr>
+              <th className="p-4 font-semibold">ชื่อกิจกรรม</th>
+              <th className="p-4 font-semibold text-center">วันที่เข้าร่วม</th>
+              <th className="p-4 font-semibold text-center">ชั่วโมง</th>
+              <th className="p-4 font-semibold text-center w-[120px]">จัดการ</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+             {activities.length === 0 ? (
+                <tr><td colSpan="4" className="p-8 text-center text-gray-400">ยังไม่มีข้อมูลกิจกรรม</td></tr>
+             ) : (
+                activities.map((item) => (
+                    <tr key={item.id} className="hover:bg-gray-50 transition">
+                        <td className="p-4 font-medium text-gray-800">{item.activityName}</td>
+                        <td className="p-4 text-center text-gray-600">{item.formattedDate}</td>
+                        <td className="p-4 text-center">
+                            <span className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs font-bold">{item.hours} ชม.</span>
+                        </td>
+                        <td className="p-4 text-center flex justify-center gap-2">
+                            <button onClick={() => handleEdit(item)} className="text-yellow-600 hover:text-yellow-800 p-2 rounded hover:bg-yellow-50 transition" title="แก้ไข">
+                                <FaEdit />
+                            </button>
+                            <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:text-red-700 p-2 rounded hover:bg-red-50 transition" title="ลบ">
+                                <FaTrash />
+                            </button>
+                        </td>
+                    </tr>
+                ))
+             )}
+          </tbody>
+        </table>
+      </div>
+
       <CompletedActivityForm 
         isOpen={isModalOpen}
         onClose={closeModal}
         activityToEdit={editingActivity}
-        userId={userId}
+        userId={userId} 
       />
-    </>
+    </div>
   );
 }

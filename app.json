@@ -1,0 +1,12 @@
+{
+  "expo": {
+    "extra": {
+      "eas": {
+        "projectId": "1120a214-3263-477f-bf71-3a1600187f4a"
+      }
+    },
+    "android": {
+      "package": "com.duangcheep.adminpanal"
+    }
+  }
+}

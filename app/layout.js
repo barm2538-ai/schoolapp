@@ -8,6 +8,8 @@ import { onAuthStateChanged } from 'firebase/auth';
 // ▲▲▲ สิ้นสุดการแก้ไข ▲▲▲
 import LoginPage from './login/page';
 import "./globals.css";
+import { FaEdit } from 'react-icons/fa';
+import { FaUserSecret } from 'react-icons/fa';
 
 export default function RootLayout({ children }) {
   const [user, setUser] = useState(null);
@@ -58,17 +60,21 @@ export default function RootLayout({ children }) {
                 <li className="mb-4"><Link href="/" className="hover:text-blue-300">จัดการประกาศ</Link></li>
                 <li className="mb-4"><Link href="/activities" className="hover:text-blue-300">จัดการกิจกรรม</Link></li>
                 <li className="mb-4"><Link href="/users" className="hover:text-blue-300">จัดการผู้ใช้</Link></li>
+                <li className="mb-4"><Link href="/personal-info" className="flex items-center gap-2 hover:text-blue-300"><FaUserSecret /> <span>จัดการข้อมูลส่วนตัว</span></Link></li>
                 <li className="mb-4"><Link href="/personnel" className="hover:text-blue-300">จัดการบุคลากร</Link></li>
                 <li className="mb-4"><Link href="/school-info" className="hover:text-blue-300">จัดการข้อมูลสถานศึกษา</Link></li>
                 <li className="mb-4"><Link href="/curriculum" className="hover:text-blue-300">จัดการหลักสูตร</Link></li>
                 <li className="mb-4"><Link href="/learning-units" className="hover:text-blue-300">จัดการหน่วยจัดการเรียนรู้</Link></li>
                 <li className="mb-4"><Link href="/learning-resources" className="hover:text-blue-300">จัดการแหล่งเรียนรู้</Link></li>
+                <li className="mb-4"><Link href="/certificate-history" className="hover:text-blue-300">ประวัติวุฒิบัตร</Link></li>
                 <li className="mb-4"><Link href="/learning-media" className="hover:text-blue-300">จัดการสื่อการเรียนรู้</Link></li>
+                <li className="mb-4"><Link href="/learning-media-categories" className="hover:text-blue-300">จัดการหมวดหมู่สื่อ</Link></li>
                 <li className="mb-4"><Link href="/forms" className="hover:text-blue-300">จัดการแบบฟอร์ม</Link></li>
                 <li className="mb-4"><Link href="/surveys" className="hover:text-blue-300">จัดการแบบประเมิน</Link></li>
                 <li className="mb-4"><Link href="/contact-info" className="hover:text-blue-300">จัดการข้อมูลติดต่อ</Link></li>
                 <li className="mb-4"><Link href="/courses" className="hover:text-blue-300">จัดการรายวิชา</Link></li>
                 <li className="mb-4"><Link href="/exams" className="hover:text-blue-300">จัดการข้อสอบ</Link></li>
+                <li className="mb-4"><Link href="/external-exams" className="flex items-center gap-2 hover:text-blue-300"><FaEdit /> <span>จัดการแบบทดสอบภายนอก</span></Link></li>
                 <li className="mb-4"><Link href="/quiz-history" className="hover:text-blue-300">ประวัติคะแนนสอบ</Link></li>
                 <li className="mb-4"><Link href="/bulk-registration" className="hover:text-blue-300">ลงทะเบียนกลุ่ม</Link></li>
                 <li className="mb-4"><Link href="/bulk-add-activities" className="hover:text-blue-300">บันทึกกิจกรรมกลุ่ม</Link></li>
@@ -80,7 +86,14 @@ export default function RootLayout({ children }) {
                 <li className="mb-4"><Link href="/maintenance-requests" className="hover:text-blue-300">รายการแจ้งซ่อม</Link></li>
                 <li className="mb-4"><Link href="/supervision-reports" className="hover:text-blue-300">รายการนิเทศ</Link></li>
                 <li className="mb-4"><Link href="/teacher-leave" className="hover:text-blue-300">บันทึกการลา (ครู)</Link></li>
+                <li className="mb-4"><Link href="/partners" className="hover:text-blue-300">จัดการภาคีเครือข่าย</Link></li>
+                <li className="mb-4"><Link href="/guidance-categories" className="hover:text-blue-300">จัดการหมวดหมู่แนะแนว</Link></li>
+                <li className="mb-4"><Link href="/guidance" className="hover:text-blue-300">จัดการข้อมูลแนะแนว</Link></li>
+                <li className="mb-4"><Link href="/vocational-categories" className="hover:text-blue-300">จัดการหมวดหมู่อาชีพ</Link></li>
+                <li className="mb-4"><Link href="/vocational-courses" className="hover:text-blue-300">จัดการหลักสูตรอาชีพ</Link></li>
                 <li className="mb-4"><Link href="/additional-links" className="hover:text-blue-300">จัดการเพิ่มเติม</Link></li>
+                <li className="mb-4"><Link href="/stats" className="hover:text-blue-300">📊 สถิติภาพรวม (Dashboard)</Link></li>
+
                 
               </ul>
             </nav>

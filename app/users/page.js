@@ -51,9 +51,11 @@ export default function UsersPage() {
     await updateDoc(userDocRef, { isAdmin: !currentStatus });
   };
 
+// ค้นหาฟังก์ชัน handleEdit เดิม แล้วเปลี่ยนเป็นอันนี้ครับ
   const handleEdit = (user) => {
-    setEditingUser(user);
-    setIsEditModalOpen(true);
+    setEditingUser(user);    // 1. เก็บข้อมูลคนที่จะแก้
+    setIsAddModalOpen(true); // 2. เปิดฟอร์ม AddUserForm (ตัวใหม่ที่มีครบ)
+    // setIsEditModalOpen(true); // <--- อันเก่าปิดทิ้งไปเลย
   };
   
   const handleDelete = async (userId) => {
@@ -74,26 +76,19 @@ export default function UsersPage() {
     setIsPasswordModalOpen(true);
   };
 
-const userCounts = useMemo(() => {
+  const userCounts = useMemo(() => {
     return users.reduce((acc, user) => {
       acc.total++;
       if (user.role === 'admin') {
         acc.admin++;
       } else if (user.role === 'teacher') {
         acc.teacher++;
-      } else { // ถ้าไม่ใช่ admin หรือ teacher ก็นับเป็น student
+      } else { 
         switch (user.educationLevel) {
-          case 'ประถม':
-            acc.primary++;
-            break;
-          case 'มัธยมต้น':
-            acc.juniorHigh++;
-            break;
-          case 'มัธยมปลาย':
-            acc.seniorHigh++;
-            break;
-          default:
-            acc.unclassified++;
+          case 'ประถม': acc.primary++; break;
+          case 'มัธยมต้น': acc.juniorHigh++; break;
+          case 'มัธยมปลาย': acc.seniorHigh++; break;
+          default: acc.unclassified++;
         }
       }
       return acc;
@@ -109,36 +104,21 @@ const userCounts = useMemo(() => {
           <h1 className="text-3xl font-bold">จัดการผู้ใช้</h1>
   
           <div>
-<div className="text-sm text-gray-500 flex flex-wrap gap-x-2">
-              <span>ทั้งหมด: {userCounts.total}</span>
-              <span>|</span>
-              <span className="text-red-500">Admin: {userCounts.admin}</span>
-              <span>|</span>
-              <span className="text-purple-500">ครู: {userCounts.teacher}</span>
-              <span>|</span>
-              <span className="text-green-500">ประถม: {userCounts.primary}</span>
-              <span>|</span>
-              <span className="text-blue-500">ม.ต้น: {userCounts.juniorHigh}</span>
-              <span>|</span>
+            <div className="text-sm text-gray-500 flex flex-wrap gap-x-2">
+              <span>ทั้งหมด: {userCounts.total}</span><span>|</span>
+              <span className="text-red-500">Admin: {userCounts.admin}</span><span>|</span>
+              <span className="text-purple-500">ครู: {userCounts.teacher}</span><span>|</span>
+              <span className="text-green-500">ประถม: {userCounts.primary}</span><span>|</span>
+              <span className="text-blue-500">ม.ต้น: {userCounts.juniorHigh}</span><span>|</span>
               <span className="text-indigo-500">ม.ปลาย: {userCounts.seniorHigh}</span>
-              {userCounts.unclassified > 0 && (
-                <>
-                  <span>|</span>
-                  <span className="text-gray-400">ไม่ระบุ: {userCounts.unclassified}</span>
-                </>
-              )}
+              {userCounts.unclassified > 0 && (<><span>|</span><span className="text-gray-400">ไม่ระบุ: {userCounts.unclassified}</span></>)}
             </div>
           </div>
           <div>
-            <Link href="/user-stats" className="bg-gray-500 text-white px-4 py-2 rounded mr-4">
-              ดูสถิติ
-            </Link>
-            <button onClick={() => setIsImportModalOpen(true)} className="bg-green-500 text-white px-4 py-2 rounded mr-4">
-              + เพิ่มผู้ใช้จากไฟล์
-            </button>
-            <button onClick={() => setIsAddModalOpen(true)} className="bg-blue-500 text-white px-4 py-2 rounded">
-              + เพิ่มผู้ใช้ใหม่
-            </button>
+            <Link href="/user-stats" className="bg-gray-500 text-white px-4 py-2 rounded mr-4">ดูสถิติ</Link>
+            <button onClick={() => setIsImportModalOpen(true)} className="bg-green-500 text-white px-4 py-2 rounded mr-4">+ เพิ่มผู้ใช้จากไฟล์</button>
+            {/* เมื่อกดเพิ่มใหม่ ให้เคลียร์ editingUser เป็น null */}
+            <button onClick={() => { setEditingUser(null); setIsAddModalOpen(true); }} className="bg-blue-500 text-white px-4 py-2 rounded">+ เพิ่มผู้ใช้ใหม่</button>
           </div>
         </div>
         
@@ -165,6 +145,10 @@ const userCounts = useMemo(() => {
                 <th className="p-4">ชื่อ-นามสกุล</th>
                 <th className="p-4">รหัสนักศึกษา</th>
                 <th className="p-4">ระดับชั้น</th>
+                
+                {/* ★★★ เพิ่มหัวตาราง ครูที่ปรึกษา ★★★ */}
+                <th className="p-4">ครูที่ปรึกษา</th> 
+
                 <th className="p-4">สถานะ</th>
                 <th className="p-4">บทบาท (Role)</th>
                 <th className="p-4">จัดการ</th>
@@ -177,6 +161,12 @@ const userCounts = useMemo(() => {
                   <td className="p-4 font-medium">{user.fullName || '-'}</td>
                   <td className="p-4 text-gray-600">{user.studentId || '-'}</td>
                   <td className="p-4 text-gray-600">{user.educationLevel || '-'}</td>
+                  
+                  {/* ★★★ เพิ่มช่องแสดงชื่อครู ★★★ */}
+                  <td className="p-4 text-gray-600">
+                      {user.role === 'student' ? (user.teacherName || '-') : '-'}
+                  </td>
+
                   <td className="p-4">
                     {user.isApproved ? (
                         <span className="bg-green-100 text-green-800 text-xs font-medium px-2.5 py-0.5 rounded-full">อนุมัติแล้ว</span>
@@ -186,7 +176,7 @@ const userCounts = useMemo(() => {
                         </button>
                     )}
                   </td>
-<td className="p-4">
+                  <td className="p-4">
                     <span className={`px-2 py-1 text-xs font-semibold rounded-full ${
                       user.role === 'admin' ? 'bg-red-200 text-red-800' :
                       user.role === 'teacher' ? 'bg-blue-200 text-blue-800' :
@@ -196,7 +186,7 @@ const userCounts = useMemo(() => {
                     </span>
                   </td>
                   <td className="p-4 whitespace-nowrap">
-                                       <Link href={`/users/${user.id}/courses`} className="bg-blue-500 text-white px-3 py-1 rounded text-sm mr-4 hover:bg-blue-600">
+                    <Link href={`/users/${user.id}/courses`} className="bg-blue-500 text-white px-3 py-1 rounded text-sm mr-4 hover:bg-blue-600">
                         ลงทะเบียน
                     </Link>
                     <Link href={`/users/${user.id}/activities`} className="bg-purple-500 text-white px-3 py-1 rounded text-sm mr-4 hover:bg-purple-600">
@@ -213,10 +203,17 @@ const userCounts = useMemo(() => {
         </div>
       </div>
 
-      <UserForm isOpen={isEditModalOpen} onClose={() => setIsEditModalOpen(false)} userToEdit={editingUser} />
-      <AddUserForm isOpen={isAddModalOpen} onClose={() => setIsAddModalOpen(false)} />
-      <UserImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />
-      <ChangePasswordModal isOpen={isPasswordModalOpen} onClose={() => setIsPasswordModalOpen(false)} user={selectedUser} />
-    </>
-  );
+{/* <UserForm ... /> ❌ ลบหรือคอมเมนต์บรรทัด UserForm ทิ้งไปเลยครับ ไม่ใช้แล้ว */}
+      
+      {/* ✅ แก้ไขบรรทัดนี้: ส่ง userToEdit (editingUser) เข้าไปใน AddUserForm ด้วย */}
+{/* แก้ไขบรรทัดนี้ครับ ให้ส่ง itemToEdit ไปด้วย */}
+      <AddUserForm 
+        isOpen={isAddModalOpen} 
+        onClose={() => { setIsAddModalOpen(false); setEditingUser(null); }} 
+        itemToEdit={editingUser} 
+      />
+      <UserImportModal isOpen={isImportModalOpen} onClose={() => setIsImportModalOpen(false)} />
+      <ChangePasswordModal isOpen={isPasswordModalOpen} onClose={() => setIsPasswordModalOpen(false)} user={selectedUser} />
+    </>
+  );
 }

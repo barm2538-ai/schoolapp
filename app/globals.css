@@ -15,11 +15,12 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --background: #0a0a0a;
-    --foreground: #ededed;
+    --foreground: #000000;
   }
 }
 
 body {
+  color: #000000;
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
@@ -29,6 +30,7 @@ body {
     display: block !important;
   }
   body {
+   
     -webkit-print-color-adjust: exact;
     print-color-adjust: exact;
   }

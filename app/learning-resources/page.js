@@ -37,34 +37,63 @@ export default function LearningResourcesPage() {
     setEditingResource(null);
   };
 
-  if (loading) return <p className="text-center p-8">กำลังโหลดข้อมูล...</p>;
+  if (loading) return <p className="p-8">กำลังโหลด...</p>;
 
   return (
     <>
-      <div className="w-full max-w-5xl">
+      <div className="w-full max-w-6xl">
         <div className="flex justify-between items-center mb-8">
-            <h1 className="text-3xl font-bold">จัดการแหล่งเรียนรู้</h1>
-            <button onClick={() => { setEditingResource(null); setIsModalOpen(true); }} className="bg-blue-500 text-white px-4 py-2 rounded">
-              + เพิ่มแหล่งเรียนรู้ใหม่
+            <h1 className="text-3xl font-bold text-black">จัดการแหล่งเรียนรู้</h1>
+            <button onClick={() => { setEditingResource(null); setIsModalOpen(true); }} className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600">
+              + เพิ่มแหล่งเรียนรู้
             </button>
         </div>
-        <div className="bg-white rounded-lg shadow-md">
+        <div className="bg-white rounded-lg shadow-md overflow-hidden">
           <table className="w-full text-left">
             <thead>
-              <tr className="bg-gray-100">
+              <tr className="bg-gray-100 text-black border-b">
                 <th className="p-4">ชื่อแหล่งเรียนรู้</th>
-                <th className="p-4">คำอธิบาย</th>
-                <th className="p-4">จัดการ</th>
+                <th className="p-4 text-center">พิกัดแผนที่</th>
+                <th className="p-4 text-center">วิดีโอ</th>
+                <th className="p-4 text-center">วุฒิบัตร</th>
+                <th className="p-4 text-right">จัดการ</th>
               </tr>
             </thead>
             <tbody>
               {resources.map((item) => (
-                <tr key={item.id} className="border-b">
-                  <td className="p-4 font-medium">{item.name}</td>
-                  <td className="p-4 text-gray-600 truncate max-w-xs">{item.description}</td>
-                  <td className="p-4">
-                    <button onClick={() => handleEdit(item)} className="text-yellow-500 hover:underline mr-4">แก้ไข</button>
-                    <button onClick={() => handleDelete(item.id)} className="text-red-500 hover:underline">ลบ</button>
+                <tr key={item.id} className="border-b hover:bg-gray-50 text-black">
+                  <td className="p-4 font-medium">{item.title}</td>
+                  
+                  {/* สถานะแผนที่ */}
+                  <td className="p-4 text-center">
+                    {item.latitude && item.longitude ? (
+                      <span className="text-green-600 text-sm bg-green-100 px-2 py-1 rounded">✓ มีพิกัด</span>
+                    ) : (
+                      <span className="text-gray-400 text-sm">-</span>
+                    )}
+                  </td>
+
+                  {/* สถานะวิดีโอ */}
+                  <td className="p-4 text-center">
+                    {(item.videoUrl || item.url) ? (
+                      <span className="text-blue-600 text-sm">Youtube</span>
+                    ) : (
+                      <span className="text-gray-400 text-sm">-</span>
+                    )}
+                  </td>
+
+                  {/* สถานะวุฒิบัตร */}
+                  <td className="p-4 text-center">
+                    {item.examId ? (
+                      <span className="text-purple-600 text-sm font-bold">★ มีสอบ</span>
+                    ) : (
+                      <span className="text-gray-400 text-sm">-</span>
+                    )}
+                  </td>
+
+                  <td className="p-4 text-right">
+                    <button onClick={() => handleEdit(item)} className="text-yellow-600 hover:underline mr-4 font-medium">แก้ไข</button>
+                    <button onClick={() => handleDelete(item.id)} className="text-red-600 hover:underline font-medium">ลบ</button>
                   </td>
                 </tr>
               ))}
